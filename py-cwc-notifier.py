@@ -23,20 +23,6 @@ for match in matches:
 if not flag:
     print("No ICC CWC 2019 match is in progress")
 
-# for match in cwc_match_list:
-#     lscore = c.livescore(match)
-#     print(json.dumps(lscore, indent=4, sort_keys=True))
-
-# notification_flag = False
-
-# overs_detail_list = list() # This need to be persisted through multiple HTTP calls
-
-# over_notification_dict = {
-#     "over_no":None,
-#     "is_notification_needed":False,
-#     "is_notified" : False
-# }
-
 #   get user input on which match to follow!
 
 final_json = dict()
@@ -69,6 +55,9 @@ def get_scores(match_id):
     recent_over_no = list()
     for over_detail in recent_commentary_list:
         over_no = over_detail["o_no"]
+        # current_score = str(over_detail["score"])+"/"+str(over_detail["score"]["wkts"])
+        current_score = str(over_detail["score"])+" for "+over_detail["wkts"]
+        print(over_detail["score"])
         over_summary = over_detail["o_summary"]
         inning_no = over_detail["i_id"]
         notification_flag = False
@@ -91,18 +80,17 @@ def get_scores(match_id):
                 if over_notification_dict["is_notification_needed"] and not over_notification_dict["is_notified"]:
                     final_notification_status = True
                     print("notification for over ", over_no)
-                    # Call a function to notify
-                    notify(over_no)
+                    notify(over_no,current_score)
                     final_json["inning1"][over_no]["is_notified"] = True
 
             else:
                 is_current_over_notified = final_json["inning1"][over_no]["is_notified"]
-                is_notification_needed_for_over = final_json["inning1"][over_no]["is_notification_needed"]
+                is_notification_needed_for_over = notification_flag
+                final_json["inning1"][over_no]["is_notification_needed"] = is_notification_needed_for_over
                 if is_notification_needed_for_over and not is_current_over_notified:
                     final_notification_status = True
                     print("notification for over ", over_no)
-                    # Call a function to notify
-                    notify(over_no)
+                    notify(over_no,current_score)
                     final_json["inning1"][over_no]["is_notified"] = True
 
 
@@ -112,35 +100,21 @@ def get_scores(match_id):
                 if over_notification_dict["is_notification_needed"] and not over_notification_dict["is_notified"]:
                     final_notification_status = True
                     print("notification for over ", over_no)
-                    notify(over_no)
+                    notify(over_no,current_score)
                     final_json["inning2"][over_no]["is_notified"] = True
             else:
                 is_current_over_notified = final_json["inning2"][over_no]["is_notified"]
-                is_notification_needed_for_over = final_json["inning2"][over_no]["is_notification_needed"]
+                is_notification_needed_for_over = notification_flag
+                final_json["inning2"][over_no]["is_notification_needed"] = is_notification_needed_for_over
                 if is_notification_needed_for_over and not is_current_over_notified:
                     final_notification_status = True
                     print("notification for over ", over_no)
-                    # Call a function to notify
-                    notify(over_no)
+                    notify(over_no,current_score)
                     final_json["inning2"][over_no]["is_notified"] = True
 
-
-        #     final_json["inning1"]
-
-    # print(recent_over_no)
-    # current_over = max(recent_over_no)
     print(final_json)
     # print(time.ctime())
     threading.Timer(20, get_scores,args=[match_id]).start()
 
 
 get_scores(match_id)
-
-
-
-# print(type(matches))
-# print (json.dumps(matches,indent=4)) #for pretty prinitng
-#
-# import json
-# with open('data.json', 'w', encoding='utf-8') as outfile:
-#     json.dump(data, outfile, ensure_ascii=False, indent=2)
