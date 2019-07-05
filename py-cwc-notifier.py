@@ -20,8 +20,6 @@ for match in matches:
             match_id = match["id"]
             flag = True
 
-if not flag:
-    print("No ICC CWC 2019 match is in progress")
 
 #   get user input on which match to follow!
 
@@ -37,7 +35,7 @@ def notify(over_no,current_score):
     notification_summary = "Big moment in over"+over_no+"\nCurrent Score : "+current_score
     n = notify2.Notification(notification_title, notification_summary)
     n.timeout = 3000  # display duration
-    # n.set_urgency(2)
+    n.set_urgency(2)
     n.show()
 
 def get_scores(match_id):
@@ -115,6 +113,9 @@ def get_scores(match_id):
     print(final_json)
     # print(time.ctime())
     threading.Timer(20, get_scores,args=[match_id]).start()
+    # threading.daemon
 
-
-get_scores(match_id)
+if flag:
+    get_scores(match_id)
+else:
+    print("No ICC CWC 2019 match is in progress")
