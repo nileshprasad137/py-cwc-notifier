@@ -1,4 +1,5 @@
 from pycricbuzz import Cricbuzz
+import datetime, threading, time
 import json
 import requests
 c = Cricbuzz()
@@ -7,13 +8,15 @@ flag = False
 cwc_match_list = list()
 big_events = ["W", "4", "6"]
 # Can be user parametrised. Like 10 runs in over and more events
+match_id = None
 for match in matches:
     if match["srs"]=="ICC Cricket World Cup 2019":
         if match["mchstate"]=="inprogress":
             # print(match["id"])
             # match_id = match["id"]
             print(match["team1"]["name"],match["team2"]["name"])
-            cwc_match_list.append((match["id"]))            
+            cwc_match_list.append((match["id"]))
+            match_id = match["id"]
             flag = True
 
 if not flag:
@@ -32,12 +35,19 @@ overs_detail_list = list() # This need to be persisted through multiple HTTP cal
 #     "is_notified" : False
 # }
 
-for match in cwc_match_list:
-    leanback_url = "http://mapps.cricbuzz.com/cbzios/match/"+match+"/leanback.json"
+#   get user input on which match to follow!
+
+next_call = time.time()
+
+def get_scores(match_id):
+    global next_call
+    print(datetime.datetime.now())
+    next_call += 1
+    leanback_url = "http://mapps.cricbuzz.com/cbzios/match/" + match_id + "/leanback.json"
     detailed_leanback = requests.get(leanback_url).json()
     previous_over = detailed_leanback["prev_overs"]
     print(previous_over)
-    commentary_url = "http://mapps.cricbuzz.com/cbzios/match/"+match+"/watch-mini-commentary.json"
+    commentary_url = "http://mapps.cricbuzz.com/cbzios/match/" + match_id + "/watch-mini-commentary.json"
     recent_commentary_json = requests.get(commentary_url).json()
     recent_commentary_list = recent_commentary_json["comm_lines"]
     recent_over_no = list()
@@ -51,16 +61,21 @@ for match in cwc_match_list:
                 notification_flag = True
 
         over_notification_dict = {
-            "inning_no":inning_no,
+            "inning_no": inning_no,
             "over_no": over_no,
             "is_notification_needed": notification_flag,
             "is_notified": False
         }
         recent_over_no.append(over_no)
         overs_detail_list.append(over_notification_dict)
-    print(recent_over_no)
+    # print(recent_over_no)
     # current_over = max(recent_over_no)
-    print(overs_detail_list)
+    # print(overs_detail_list)
+    # print(time.ctime())
+    threading.Timer(10, get_scores,args=[match_id]).start()
+
+
+get_scores(match_id)
 
 
 
