@@ -44,12 +44,14 @@ for match in cwc_match_list:
     for over_detail in recent_commentary_list:
         over_no = over_detail["o_no"]
         over_summary = over_detail["o_summary"]
+        inning_no = over_detail["i_id"]
         notification_flag = False
         for event in over_summary:
             if event in big_events:
                 notification_flag = True
 
         over_notification_dict = {
+            "inning_no":inning_no,
             "over_no": over_no,
             "is_notification_needed": notification_flag,
             "is_notified": False
@@ -64,3 +66,7 @@ for match in cwc_match_list:
 
 # print(type(matches))
 # print (json.dumps(matches,indent=4)) #for pretty prinitng
+#
+# import json
+# with open('data.json', 'w', encoding='utf-8') as outfile:
+#     json.dump(data, outfile, ensure_ascii=False, indent=2)
