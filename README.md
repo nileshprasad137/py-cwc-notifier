@@ -4,3 +4,7 @@
 <br>
 You can make simple edits in the code to make the notification service work in your desired manner. 
 Example - You want to be notified when there are 2 wickets in an over or 2 sixes, etc.
+
+#### Sreenshots
+
+![Screenshot](screenshots/ss.png)
